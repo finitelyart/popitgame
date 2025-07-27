@@ -7,28 +7,40 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      strategies: 'generateSW',
-      minify: false,
-      includeAssets: ['vite.svg'], // Only include existing assets
+      includeAssets: ['logo.svg'],
       manifest: {
-        name: 'My Awesome PWA', // Your app's full name
-        short_name: 'MyPWA',    // Short name for homescreen
-        description: 'My awesome React TypeScript PWA!',
-        theme_color: '#ffffff', // Theme color for the browser UI
+        name: 'ASMR Pop-It',
+        short_name: 'PopIt',
+        description: 'A soothing, interactive Pop-It toy experience built with React and Three.js.',
+        theme_color: '#90E0EF',
+        background_color: '#ffffff',
+        display: "standalone",
+        scope: "/my-pwa-app/",
+        start_url: "/my-pwa-app/",
         icons: [
           {
-            src: 'vite.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: 'logo.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml'
           },
-        ],
+          {
+            src: 'logo.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'logo.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+          }
+        ]
       },
       devOptions: {
-        enabled: true, // Enable PWA in development for testing
+        enabled: true,
       },
     }),
   ],
-build: {minify: false},
-base: '/my-pwa-app/',
+  base: '/my-pwa-app/',
 });
 

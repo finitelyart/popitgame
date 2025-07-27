@@ -1,5 +1,5 @@
 {
-  "name": "my-pwa-app",
+  "name": "asmr-pop-it",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,14 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-spring/three": "^9.7.3",
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.16.8",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.3",
+    "three": "^0.167.0",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/three": "^0.167.1",
     "@vite-pwa/assets-generator": "^1.0.0",
     "@vitejs/plugin-react": "^4.6.0",
     "eslint": "^9.30.1",

@@ -1,69 +1,44 @@
-# React + TypeScript + Vite
+# ASMR Pop-It: A Web-Based Sensory Experience
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a web-based, interactive ASMR Pop-It toy built with React, TypeScript, and Vite, leveraging the power of `@react-three/fiber` for 3D rendering and the Web Audio API for procedurally generated sound. It is designed as a Progressive Web App (PWA) for a seamless, installable, and offline-first experience.
 
-Currently, two official plugins are available:
+## Core Tenet: Programmatic Generation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+A key constraint and feature of this project is that **all graphical and audio assets are generated programmatically at runtime**. No external `.png`, `.svg`, `.glb`, or `.mp3` files are loaded for the core application experience.
 
-## Expanding the ESLint configuration
+-   **Graphics:** 3D models are created using Three.js geometry, rendered into the scene with `@react-three/fiber`. UI elements like icons are rendered as inline SVGs within React components.
+-   **Audio:** All sound effects, from the satisfying "pop" to reward chimes, are synthesized on the fly using the Web Audio API.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+-   **Interactive 3D Pop-It:** A realistic, interactive Pop-It toy that can be rotated and manipulated.
+-   **Procedural Audio:** Satisfying pop sounds with slight variations, providing a rich ASMR experience.
+-   **Multiple Game Modes:**
+    -   **Free Play:** Simply pop for relaxation.
+    -   **Pop Race:** Race against the clock to pop all the bubbles.
+    -   **Memory Pop:** Test your memory by repeating increasingly long sequences.
+    -   **Learning Modes:** Alphabet and number popping for educational fun.
+-   **PWA Ready:** Install the app on your device for easy access and offline play.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+-   **Framework:** React 19 + Vite
+-   **Language:** TypeScript
+-   **3D Rendering:** `@react-three/fiber`, `@react-three/drei`, `three.js`
+-   **Animation:** `@react-spring/three`
+-   **State Management:** Zustand
+-   **Audio:** Web Audio API
+-   **Deployment:** PWA, deployable to services like GitHub Pages.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+This will start the Vite development server, and you can open your browser to interact with the application.
