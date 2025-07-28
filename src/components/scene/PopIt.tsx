@@ -73,6 +73,32 @@ const PopIt = () => {
     });
   };
 
+  const handlePointerEvent = (e: any) => {
+    e.stopPropagation();
+    const { x, y } = e.point;
+
+    // Convert intersection point to grid coordinates
+    const col = Math.floor((x + WIDTH / 2) / BUBBLE_SPACING);
+    const row = Math.floor((y + HEIGHT / 2) / BUBBLE_SPACING);
+    
+    if (col < 0 || col >= COLS || row < 0 || row >= ROWS) {
+      return;
+    }
+
+    // Calculate the center of the bubble in the identified cell
+    const bubbleX = col * BUBBLE_SPACING - WIDTH / 2 + BUBBLE_SPACING / 2;
+    const bubbleY = row * BUBBLE_SPACING - HEIGHT / 2 + BUBBLE_SPACING / 2;
+    
+    // Check if the intersection point is within the bubble's radius on the XY plane
+    const distance = Math.sqrt(Math.pow(x - bubbleX, 2) + Math.pow(y - bubbleY, 2));
+
+    if (distance < BUBBLE_RADIUS) {
+      const instanceId = row * COLS + col;
+      popBubble(instanceId);
+    }
+  };
+
+
   return (
     <group>
       {/* Base of the Pop-It */}
@@ -84,20 +110,23 @@ const PopIt = () => {
       <instancedMesh
         ref={meshRef}
         args={[bubbleGeometry, undefined, ROWS * COLS]}
-        onPointerDown={(e) => {
-          e.stopPropagation();
-          if (e.instanceId !== undefined) popBubble(e.instanceId);
-        }}
-        onPointerMove={(e) => {
-            // Allows for satisfying swipe-to-pop gesture
-            if (e.buttons > 0) { // Check if mouse button is pressed
-                e.stopPropagation();
-                if (e.instanceId !== undefined) popBubble(e.instanceId);
-            }
-        }}
       >
         <meshStandardMaterial color="#81C784" />
       </instancedMesh>
+
+      {/* An invisible plane that sits on top of the bubbles to provide a large, reliable hit area. */}
+      <mesh
+        onPointerDown={handlePointerEvent}
+        onPointerMove={(e) => {
+            // Allows for satisfying swipe-to-pop gesture
+            if (e.buttons > 0) { // Check if mouse button is pressed
+                handlePointerEvent(e)
+            }
+        }}
+      >
+        <planeGeometry args={[WIDTH, HEIGHT]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
     </group>
   );
 };
