@@ -17,10 +17,24 @@ const dummy = new THREE.Object3D();
 const PopIt = () => {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   
-  // State to track which bubbles are popped to prevent re-popping.
   const [poppedBubbles, setPoppedBubbles] = useState(() => Array(ROWS * COLS).fill(false));
 
-  const bubbleGeometry = useMemo(() => new THREE.SphereGeometry(BUBBLE_RADIUS, 16, 16), []);
+  const [bubbleGeometry, bubbleMaterial] = useMemo(() => {
+    const geometry = new THREE.SphereGeometry(BUBBLE_RADIUS, 16, 16);
+    const count = ROWS * COLS;
+    const colors = new Float32Array(count * 3);
+    const color = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+      // A simple rainbow gradient across all bubbles
+      color.setHSL(i / count, 0.7, 0.6).toArray(colors, i * 3);
+    }
+    geometry.setAttribute('color', new THREE.InstancedBufferAttribute(colors, 3));
+    
+    const material = new THREE.MeshStandardMaterial({ vertexColors: true });
+    
+    return [geometry, material];
+  }, []);
 
   // Initialize bubble positions
   useEffect(() => {
@@ -38,42 +52,38 @@ const PopIt = () => {
       }
     }
     mesh.instanceMatrix.needsUpdate = true;
-  }, []);
+  }, [bubbleGeometry]);
 
-  const popBubble = (instanceId: number) => {
+  const setBubbleState = (instanceId: number, shouldBePopped: boolean) => {
     setPoppedBubbles((currentPoppedState) => {
-      // If bubble is already popped, do nothing.
-      if (currentPoppedState[instanceId]) {
+      // If the bubble is already in the desired state, do nothing.
+      if (currentPoppedState[instanceId] === shouldBePopped) {
         return currentPoppedState;
       }
-
-      // This bubble is being popped for the first time.
+  
       playPopSound();
-
+  
       const mesh = meshRef.current;
       if (!mesh) return currentPoppedState;
-
-      // To ensure consistent positioning and avoid cumulative transforms, we
-      // calculate the bubble's position from scratch rather than modifying its current matrix.
+  
       const row = Math.floor(instanceId / COLS);
       const col = instanceId % COLS;
       const x = col * BUBBLE_SPACING - WIDTH / 2 + BUBBLE_SPACING / 2;
       const y = row * BUBBLE_SPACING - HEIGHT / 2 + BUBBLE_SPACING / 2;
-
-      // Set the bubble to its "popped" state (pushed back).
-      dummy.position.set(x, y, -1);
+  
+      // Set the bubble to its new state (popped: z=-1, un-popped: z=0).
+      dummy.position.set(x, y, shouldBePopped ? -1 : 0);
       dummy.updateMatrix();
       mesh.setMatrixAt(instanceId, dummy.matrix);
       mesh.instanceMatrix.needsUpdate = true;
-
-      // Return the new state array marking this bubble as popped
+  
       const newPoppedState = [...currentPoppedState];
-      newPoppedState[instanceId] = true;
+      newPoppedState[instanceId] = shouldBePopped;
       return newPoppedState;
     });
   };
 
-  const handlePointerEvent = (e: any) => {
+  const handlePointerEvent = (e: any, action: 'pop' | 'unpop') => {
     e.stopPropagation();
     const { x, y } = e.point;
 
@@ -94,7 +104,7 @@ const PopIt = () => {
 
     if (distance < BUBBLE_RADIUS) {
       const instanceId = row * COLS + col;
-      popBubble(instanceId);
+      setBubbleState(instanceId, action === 'pop');
     }
   };
 
@@ -103,25 +113,32 @@ const PopIt = () => {
     <group>
       {/* Base of the Pop-It */}
       <RoundedBox args={[WIDTH, HEIGHT, 1]} position={[0,0,-0.5]} radius={0.5}>
-        <meshStandardMaterial color="#A5D6A7" />
+        <meshStandardMaterial color="#ECEFF1" />
       </RoundedBox>
       
-      {/* The bubbles, rendered as a single high-performance InstancedMesh */}
+      {/* The bubbles, rendered with instance-specific colors */}
       <instancedMesh
         ref={meshRef}
-        args={[bubbleGeometry, undefined, ROWS * COLS]}
-      >
-        <meshStandardMaterial color="#81C784" />
-      </instancedMesh>
+        args={[bubbleGeometry, bubbleMaterial, ROWS * COLS]}
+      />
 
-      {/* An invisible plane that sits on top of the bubbles to provide a large, reliable hit area. */}
+      {/* FRONT invisible plane for popping bubbles (pushing them in) */}
       <mesh
-        onPointerDown={handlePointerEvent}
+        onPointerDown={(e) => handlePointerEvent(e, 'pop')}
         onPointerMove={(e) => {
-            // Allows for satisfying swipe-to-pop gesture
-            if (e.buttons > 0) { // Check if mouse button is pressed
-                handlePointerEvent(e)
-            }
+            if (e.buttons > 0) handlePointerEvent(e, 'pop')
+        }}
+      >
+        <planeGeometry args={[WIDTH, HEIGHT]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
+
+      {/* BACK invisible plane for un-popping bubbles (pushing them out) */}
+      <mesh
+        position={[0, 0, -1]}
+        onPointerDown={(e) => handlePointerEvent(e, 'unpop')}
+        onPointerMove={(e) => {
+            if (e.buttons > 0) handlePointerEvent(e, 'unpop')
         }}
       >
         <planeGeometry args={[WIDTH, HEIGHT]} />

@@ -11,8 +11,8 @@ const Experience = () => {
       <PerspectiveCamera makeDefault position={[0, 0, 30]} />
       <OrbitControls 
         enableZoom={false}
-        minPolarAngle={Math.PI / 2}
-        maxPolarAngle={Math.PI / 2}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI}
       />
       
       <PopIt />
