@@ -7,27 +7,31 @@ const getContext = (): AudioContext => {
   return audioContext;
 };
 
-// Function to generate the satisfying "pop"
+// Function to generate a more satisfying "pop" sound
 export const playPopSound = () => {
   const context = getContext();
-  const oscillator = context.createOscillator();
-  const gainNode = context.createGain();
-
-  // The "pop" comes from a sharp volume envelope
   const now = context.currentTime;
-  gainNode.gain.setValueAtTime(0, now);
-  gainNode.gain.linearRampToValueAtTime(1, now + 0.01); // Sharp attack
-  gainNode.gain.linearRampToValueAtTime(0, now + 0.1);  // Quick decay
 
-  // Randomize pitch for variety
-  oscillator.frequency.value = 300 + Math.random() * 200; // Pitch between 300-500 Hz
-  oscillator.type = 'triangle'; // 'triangle' or 'sine' works well
+  // Master Gain for the overall sound envelope
+  const masterGain = context.createGain();
+  masterGain.connect(context.destination);
+  masterGain.gain.setValueAtTime(0, now);
+  // Fast attack, then decay to create a "thump"
+  masterGain.gain.linearRampToValueAtTime(0.7, now + 0.01); // Quick attack
+  masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25); // Slower decay for more body
 
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
+  // Oscillator for the tonal part of the pop
+  const oscillator = context.createOscillator();
+  oscillator.type = 'triangle';
+  
+  // Pitch envelope for a deeper "thwump" sound
+  const initialPitch = 150 + Math.random() * 50; // Pitch between 150-200 Hz for a bassier pop
+  oscillator.frequency.setValueAtTime(initialPitch, now);
+  oscillator.frequency.exponentialRampToValueAtTime(initialPitch * 0.5, now + 0.1); // Quick pitch drop
 
+  oscillator.connect(masterGain);
   oscillator.start(now);
-  oscillator.stop(now + 0.1);
+  oscillator.stop(now + 0.25);
 
   // Haptic feedback for mobile devices
   if (navigator.vibrate) {

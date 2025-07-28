@@ -61,7 +61,7 @@ const PopIt = () => {
       const y = row * BUBBLE_SPACING - HEIGHT / 2 + BUBBLE_SPACING / 2;
 
       // Set the bubble to its "popped" state (pushed back).
-      dummy.position.set(x, y, -0.5);
+      dummy.position.set(x, y, -1);
       dummy.updateMatrix();
       mesh.setMatrixAt(instanceId, dummy.matrix);
       mesh.instanceMatrix.needsUpdate = true;
