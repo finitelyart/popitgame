@@ -49,14 +49,21 @@ const PopIt = () => {
 
       // This bubble is being popped for the first time.
       playPopSound();
-      
-      // Get the current transformation matrix of the bubble instance
-      const mesh = meshRef.current;
-      mesh.getMatrixAt(instanceId, dummy.matrix);
 
-      // Apply a translation to "push" it down and update the mesh
-      const newMatrix = dummy.matrix.clone().premultiply(new THREE.Matrix4().makeTranslation(0, 0, -0.5));
-      mesh.setMatrixAt(instanceId, newMatrix);
+      const mesh = meshRef.current;
+      if (!mesh) return currentPoppedState;
+
+      // To ensure consistent positioning and avoid cumulative transforms, we
+      // calculate the bubble's position from scratch rather than modifying its current matrix.
+      const row = Math.floor(instanceId / COLS);
+      const col = instanceId % COLS;
+      const x = col * BUBBLE_SPACING - WIDTH / 2 + BUBBLE_SPACING / 2;
+      const y = row * BUBBLE_SPACING - HEIGHT / 2 + BUBBLE_SPACING / 2;
+
+      // Set the bubble to its "popped" state (pushed back).
+      dummy.position.set(x, y, -0.5);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(instanceId, dummy.matrix);
       mesh.instanceMatrix.needsUpdate = true;
 
       // Return the new state array marking this bubble as popped
