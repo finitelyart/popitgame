@@ -15,8 +15,8 @@ export default defineConfig({
         theme_color: '#90E0EF',
         background_color: '#ffffff',
         display: "standalone",
-        scope: "/my-pwa-app/",
-        start_url: "/my-pwa-app/",
+        scope: "/popitgame/",
+        start_url: "/popitgame/",
         icons: [
           {
             src: 'logo.svg',
@@ -41,6 +41,6 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/my-pwa-app/',
+  base: '/popitgame/',
 });
 
