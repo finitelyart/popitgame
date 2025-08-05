@@ -17,7 +17,7 @@ const dummy = new THREE.Object3D();
 const PopIt = () => {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   
-  const [poppedBubbles, setPoppedBubbles] = useState(() => Array(ROWS * COLS).fill(false));
+  const [, setPoppedBubbles] = useState(() => Array(ROWS * COLS).fill(false));
 
   const [bubbleGeometry, bubbleMaterial] = useMemo(() => {
     const geometry = new THREE.SphereGeometry(BUBBLE_RADIUS, 16, 16);
